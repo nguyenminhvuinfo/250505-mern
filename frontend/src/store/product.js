@@ -46,7 +46,7 @@ export const useProductStore = create((set) => ({
         if (!data.success) return {success: false, message: data.message};
         
         // update UI ngay lập tức mà khum cần refresh
-        set(state => ({
+        set(state => ({ 
             products: state.products.map((product) => (product._id === pid ? data.data : product)),
         }));
         return {success: true, message: data.message};
