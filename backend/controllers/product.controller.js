@@ -28,10 +28,10 @@ export const createProducts = async (req, res) => {
     await newProduct.save();
 
     await AuditLog.create({
-      user: req.user.userId,
-      action: "CREATE",
-      productId: newProduct._id,
-      changes: newProduct,
+        user: req.user?._id || null,
+        action: "CREATE",
+        productId: newProduct._id,
+        changes: newProduct,
     });
 
     res.status(201).json({ success: true, data: newProduct });
@@ -60,10 +60,10 @@ export const updateProduct = async (req, res) => {
     });
 
     await AuditLog.create({
-        user: req.user._id,
-        action: "CREATE",
-        productId: newProduct._id,
-        changes: newProduct,
+        user: req.user?._id || null,
+        action: "UPDATE",
+        productId: id,
+        changes: updatedProduct,
     });
 
     res.status(200).json({ success: true, data: updatedProduct });
