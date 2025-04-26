@@ -3,7 +3,7 @@ import { registerUser, loginUser } from "../controllers/authen.controller.js";
 
 const router = express.Router();
 
-router.post("/", registerUser); // Đăng ký
-router.post("/login", loginUser); // Đăng nhập
+router.post("/register", registerUser); 
+router.post("/login", loginUser);
 
 export default router;

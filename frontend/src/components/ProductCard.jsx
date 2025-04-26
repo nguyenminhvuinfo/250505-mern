@@ -80,7 +80,7 @@ const ProductCard = ({product}) => {
    _hover={{transform: "translateY(-5px)", shadow: "xl"}}
    bg={bg}
    >
-    <Image src={product.image}  fallbackSrc="https://i.pinimg.com/736x/f0/f8/85/f0f885b81b5848e9b9379f3e6e0a2437.jpg" alt={product.name} h={48} w='full' objectFit = 'cover' />
+    <Image src={product.image}  fallbackSrc="https://i.pinimg.com/originals/ef/8b/bd/ef8bbd4554dedcc2fd1fd15ab0ebd7a1.gif" alt={product.name} h={48} w='full' objectFit = 'cover' />
     <Box p={4}>
         <Heading as='h3' size='md' mb={2}>
             {product.name}

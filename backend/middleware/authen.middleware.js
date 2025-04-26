@@ -7,9 +7,7 @@ export const protect = async (req, res, next) => {
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return res.status(401).json({ success: false, message: "Không có token, truy cập bị từ chối" });
   }
-
   const token = authHeader.split(" ")[1];
-
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findById(decoded.userId);

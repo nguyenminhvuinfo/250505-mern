@@ -7,25 +7,60 @@ export const useProductStore = create((set) => ({
         if (!newProduct.name || !newProduct.price || !newProduct.image){
             return {success: false, message:"Vui lòng điền đầy đủ thông tin sản phẩm."}
         }
+        
+        // Lấy token từ localStorage
+        const token = localStorage.getItem("token");
+        if (!token) {
+            return {success: false, message: "Bạn cần đăng nhập để thực hiện chức năng này."}
+        }
+        
         const res = await fetch("/api/products", {
             method:"POST",
             headers:{
                 "Content-Type":"application/json",
+                "Authorization": `Bearer ${token}` // Thêm token vào header
             },
             body:JSON.stringify(newProduct),
         });
         const data = await res.json();
+        
+        if (!data.success) {
+            return {success: false, message: data.message}
+        }
+        
         set((state) => ({ products: [...state.products, data.data] }));
         return {success: true, message:"Sản phẩm mới đã được tạo."}
     }, 
     fetchProducts: async () => {
-        const res = await fetch("/api/products");
+        // Lấy token từ localStorage
+        const token = localStorage.getItem("token");
+        
+        const headers = token 
+            ? { "Authorization": `Bearer ${token}` } 
+            : {};
+            
+        const res = await fetch("/api/products", {
+            headers: headers
+        });
         const data = await res.json();
-        set({ products: data.data });
+        
+        if (data.success) {
+            set({ products: data.data });
+        }
+        return data;
     },
     deleteProduct: async(pid) =>{
+        // Lấy token từ localStorage
+        const token = localStorage.getItem("token");
+        if (!token) {
+            return {success: false, message: "Bạn cần đăng nhập để thực hiện chức năng này."}
+        }
+        
         const res = await fetch(`/api/products/${pid}`, {
             method: "DELETE",
+            headers: {
+                "Authorization": `Bearer ${token}` // Thêm token vào header
+            }
         });
         const data = await res.json();
         if(!data.success) return {success: false, message: data.message};
@@ -35,10 +70,17 @@ export const useProductStore = create((set) => ({
         return {success: true, message: data.message};
     },
     updateProduct: async(pid, updatedProduct) =>{
+        // Lấy token từ localStorage
+        const token = localStorage.getItem("token");
+        if (!token) {
+            return {success: false, message: "Bạn cần đăng nhập để thực hiện chức năng này."}
+        }
+        
         const res = await fetch(`/api/products/${pid}`,{
             method: "PUT",
             headers:{
                 "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}` // Thêm token vào header
             },
             body: JSON.stringify(updatedProduct),
         });
