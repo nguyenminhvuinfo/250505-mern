@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import authenRoutes from "./routes/authen.route.js";
 import auditRoutes from "./routes/audit.route.js";
+import hoadonRoutes from "./routes/hoadon.route.js";
 
 import { connectDB } from "./config/db.js";
 
@@ -17,6 +18,8 @@ app.use(express.json()); // này để nhận file Json nhé
 app.use("/api/auditlogs", auditRoutes);
 
 app.use("/api/authen", authenRoutes);
+
+app.use("/api/invoices", hoadonRoutes)
 
 app.use("/api/products", productRoutes);
 

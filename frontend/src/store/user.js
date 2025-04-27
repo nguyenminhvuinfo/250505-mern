@@ -27,7 +27,7 @@ export const useAuthStore = create((set) => ({
       } else {
         localStorage.setItem("token", data.token);
         set({ 
-          user: data.user || { email: credentials.email },
+          user: data.user || {name: credentials.name} || { email: credentials.email },
           isAuthenticated: true,
           isLoading: false
         });

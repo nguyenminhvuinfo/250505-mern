@@ -1,22 +1,25 @@
-import mongoose from 'mongoose';
+// models/product.model.js
+import mongoose from "mongoose";
 
 const productSchema = new mongoose.Schema({
-    name:{
-        type: String,
-        required: true
-    },
-    price:{
-        type: Number,
-        required: true
-    },
-    image:{
-        type: String,
-        required: true
-    },
-}, {
-    timestamps: true // thuộc tình này lưu thời gian tạo (CreateAt) và thời gian update (UpdateAt)
-});
+  name: {
+    type: String,
+    required: [true, "Tên sản phẩm là bắt buộc"],
+    unique: true,
+    trim: true,
+    minlength: [1, "Tên phải có ít nhất 1 ký tự"],
+    maxlength: [40, "Tên không vượt quá 40 ký tự"]
+  },
+  price: {
+    type: Number,
+    required: [true, "Giá sản phẩm là bắt buộc"],
+    min: [1, "Giá phải ≥ 1"],
+    max: [10000, "Giá phải ≤ 10000"]
+  },
+  image: {
+    type: String,
+    required: [true, "Link ảnh là bắt buộc"]
+  }
+}, { timestamps: true });
 
-const Product = mongoose.model('Product', productSchema);
-
-export default Product;
+export default mongoose.model("Product", productSchema);

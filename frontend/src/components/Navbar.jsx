@@ -1,16 +1,19 @@
 import { Box, Button, Container, Flex, HStack, Text, Input, useColorMode, useColorModeValue, Menu, MenuButton, MenuList, MenuItem, Icon } from '@chakra-ui/react';
 import { Link, useNavigate } from "react-router-dom";
 import { PlusSquareIcon, ChevronDownIcon } from "@chakra-ui/icons";
+import { FaUser, FaClipboardList, FaReceipt, FaChartLine, FaSignOutAlt } from "react-icons/fa";
 import { IoMoon } from "react-icons/io5";
 import { LuSun } from "react-icons/lu";
-import { FaUser, FaClipboardList, FaReceipt, FaChartLine, FaSignOutAlt } from "react-icons/fa";
-import { useAuthStore } from "../store/user"; 
+import { useAuthStore } from "../store/user";
+import { useDisclosure } from '@chakra-ui/react';
+import AuditLogs from './AuditLogs'; // Import Modal
 
-const Navbar = ({onSearch}) => {
-  const {colorMode, toggleColorMode} = useColorMode();
+const Navbar = ({ onSearch }) => {
+  const { colorMode, toggleColorMode } = useColorMode();
   const bg = useColorModeValue("gray.100", "gray.900");
   const navigate = useNavigate();
   const { logout, user } = useAuthStore();
+  const { isOpen, onOpen, onClose } = useDisclosure(); // Modal control
 
   const handleChange = (e) => {
     onSearch(e.target.value);
@@ -22,39 +25,16 @@ const Navbar = ({onSearch}) => {
   };
 
   return (
-/* 
-Cái này là cái thanh NavBar cao nhất á nha cá doi, thẻ container sẽ chứa hết thanh đó (gồm logo, icon, sukem store...) 
-Cái useColorModeValue trả về màu bg cho container navbar tùy vào lựa chọn màu nền, light mode thì gray.100 và ngược lại
-*/
-
     <Box position="sticky" top="0" zIndex="999" bg={bg} boxShadow="sm" w="100%">
       <Container maxW="1140px" px={4} py={2}>
-        <Flex
-          h={16}
-          alignItems="center"
-          justifyContent="space-between"
-          flexDir={{ base: "column", sm: "row" }}
-          px={2}
-        >
+        <Flex h={16} alignItems="center" justifyContent="space-between" flexDir={{ base: "column", sm: "row" }} px={2}>
           {/* Logo */}
-          <Text
-            fontSize={{ base: "22", sm: "28" }}
-            fontWeight="bold"
-            textTransform="uppercase"
-            textAlign="center"
-            bgGradient="linear(to-r, cyan.400, blue.500)"
-            bgClip="text"
-          >
+          <Text fontSize={{ base: "22", sm: "28" }} fontWeight="bold" textTransform="uppercase" textAlign="center" bgGradient="linear(to-r, cyan.400, blue.500)" bgClip="text">
             <Link to="/">Sukem Store 🛒</Link>
           </Text>
 
           {/* Thanh Tìm kiếm */}
-          <Input
-            placeholder="Tìm tên sản phẩm..."
-            onChange={handleChange}
-            bg={useColorModeValue("white", "gray.700")}
-            w={{ base: "100%", sm: "500px" }}
-          />
+          <Input placeholder="Tìm tên sản phẩm..." onChange={handleChange} bg={useColorModeValue("white", "gray.700")} w={{ base: "100%", sm: "500px" }} />
 
           {/* Nút tạo, đổi màu và tài khoản */}
           <HStack spacing={2}>
@@ -76,7 +56,7 @@ Cái useColorModeValue trả về màu bg cho container navbar tùy vào lựa c
                 <Text px={3} py={1} fontSize="sm" color="gray.500">
                   Xin chào, {user?.name || user?.email || "Pháp sư vô danh"}
                 </Text>
-                <MenuItem icon={<FaClipboardList />}>
+                <MenuItem icon={<FaClipboardList />} onClick={onOpen}>
                   Nhật ký chỉnh sửa
                 </MenuItem>
                 <MenuItem icon={<FaReceipt />}>
@@ -93,6 +73,9 @@ Cái useColorModeValue trả về màu bg cho container navbar tùy vào lựa c
           </HStack>
         </Flex>
       </Container>
+
+      {/* Modal Audit Log */}
+      <AuditLogs isOpen={isOpen} onClose={onClose} />
     </Box>
   );
 };
