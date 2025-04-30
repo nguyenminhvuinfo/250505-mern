@@ -1,5 +1,5 @@
 import express from "express";
-import { createInvoice, getInvoices, getInvoiceById } from "../controllers/hoadon.controller.js";
+import { createInvoice, getInvoices, getInvoiceById, deleteInvoices } from "../controllers/hoadon.controller.js";
 import { protect } from "../middleware/authen.middleware.js"; // Middleware bảo vệ nếu cần
 
 const router = express.Router();
@@ -10,5 +10,7 @@ router.post("/", protect, createInvoice);  // Đây là route để tạo hóa �
 router.get("/", protect, getInvoices);
 
 router.get("/:id", protect, getInvoiceById);
+
+router.delete("/", protect, deleteInvoices);
 
 export default router;

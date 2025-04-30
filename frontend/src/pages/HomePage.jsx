@@ -1,61 +1,94 @@
-import { Container, VStack, Text, SimpleGrid } from "@chakra-ui/react";
-import { useEffect } from "react";
+import { 
+  Container, 
+  Text, 
+  SimpleGrid, 
+  Flex, 
+  Box,
+} from "@chakra-ui/react";
+import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { useProductStore } from "../store/product";
+import { useAuthStore } from "../store/user";
 import ProductCard from "../components/ProductCard";
+import Receipt from "../components/Receipt";
 
-const HomePage = ({ searchKeyword }) => {
+const HomePage = ({ searchKeyword = "" }) => {
   const { fetchProducts, products } = useProductStore();
-
+  const { isAuthenticated, user, checkAuth } = useAuthStore();
+  
+  // Tạo ref để có thể gọi phương thức từ component Receipt
+  const receiptRef = useRef(null);
+  
   useEffect(() => {
     fetchProducts();
-  }, [fetchProducts]);
-
-  console.log("products", products);
+    checkAuth();
+  }, [fetchProducts, checkAuth]);
 
   // Lọc sản phẩm theo từ khóa tìm kiếm
   const filteredProducts = products.filter((product) => {
-    // Kiểm tra nếu product.name là chuỗi hợp lệ trước khi gọi toLowerCase
     return product.name && product.name.toLowerCase().includes(searchKeyword.toLowerCase());
   });
 
-  return (
-    <Container maxW='container.xl' py={12}>
-      <VStack spacing={8}>
-        <Text
-          fontSize={"30"}
-          fontWeight={"bold"}
-          bgGradient={"linear(to-r, cyan.400, blue.500)"}
-          bgClip={"text"}
-          textAlign={"center"}
-        >
-          Các sản phẩm hiện có 🚀
-        </Text>
+  // Hàm để thêm sản phẩm vào giỏ hàng
+  const handleAddToCart = (product) => {
+    if (receiptRef.current) {
+      receiptRef.current.addToCart(product);
+    }
+  };
 
-        <SimpleGrid
-          columns={{
-            base: 1,
-            md: 2,
-            lg: 3
-          }}
-          spacing={10}
-          w={"full"}
-        >
-          {filteredProducts.map((product) => (
-            <ProductCard key={product._id} product={product} />
-          ))}
-        </SimpleGrid>
-        {filteredProducts.length === 0 && (
-          <Text fontSize='xl' textAlign={"center"} fontWeight='bold' color='gray.500'>
-            Hiện chưa có sản phẩm 😢{" "}
-            <Link to={"/create"}>
-              <Text as='span' color='blue.500' _hover={{ textDecoration: "underline" }}>
-                Tạo mới sản phẩm
-              </Text>
-            </Link>
+  return (
+    <Container maxW='container.xl' py={8}>
+      <Flex direction={{ base: "column", lg: "row" }} gap={6}>
+        {/* Phần danh sách sản phẩm - chiếm 2/3 bên trái */}
+        <Box flex="2" pr={{ base: 0, lg: 4 }}>
+          <Text
+            fontSize={"30"}
+            fontWeight={"bold"}
+            bgGradient={"linear(to-r, cyan.400, blue.500)"}
+            bgClip={"text"}
+            textAlign={"center"}
+            mb={8}
+            mx="auto"
+            maxW="container.lg"
+          >
+            Các sản phẩm hiện có 🚀
           </Text>
-        )}
-      </VStack>
+          
+          <SimpleGrid
+            columns={{
+              base: 1,
+              sm: 2,
+              md: 3,
+              lg: 4
+            }}
+            spacing={4}
+            w={"full"}
+          >
+            {filteredProducts.map((product) => (
+              <Box key={product._id} onClick={() => handleAddToCart(product)} cursor="pointer">
+                <ProductCard product={product} compact={true} />
+              </Box>
+            ))}
+          </SimpleGrid>
+          {filteredProducts.length === 0 && (
+            <Text fontSize='xl' textAlign={"center"} fontWeight='bold' color='gray.500'>
+              Hiện chưa có sản phẩm 😢{" "}
+              <Link to={"/create"}>
+                <Text as='span' color='blue.500' _hover={{ textDecoration: "underline" }}>
+                  Tạo mới sản phẩm
+                </Text>
+              </Link>
+            </Text>
+          )}
+        </Box>
+
+        {/* Phần hóa đơn - sử dụng component Receipt */}
+        <Receipt
+          ref={receiptRef}
+          isAuthenticated={isAuthenticated}
+          user={user}
+        />
+      </Flex>
     </Container>
   );
 };

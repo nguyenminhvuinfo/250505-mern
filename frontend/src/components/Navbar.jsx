@@ -60,7 +60,7 @@ const Navbar = ({ onSearch }) => {
                   Nhật ký chỉnh sửa
                 </MenuItem>
                 <MenuItem icon={<FaReceipt />}>
-                  Nhật ký hóa đơn
+                  Lịch sử giao dịch
                 </MenuItem>
                 <MenuItem icon={<FaChartLine />}>
                   Thống kê doanh thu

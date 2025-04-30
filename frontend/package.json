@@ -16,6 +16,8 @@
     "@emotion/styled": "^11.14.0",
     "framer-motion": "^12.6.5",
     "mernstack": "file:..",
+    "node-fetch": "^3.3.2",
+    "qrcode.react": "^4.2.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-icon": "^1.0.0",

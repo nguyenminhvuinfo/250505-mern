@@ -6,6 +6,4 @@ Web bán hàng dạng POS áp dụng Mern Stack - Sukem Store - Sẽ đảm bả
 
 + Giao dịch bán hàng
 
-+ In hóa đơn
-
-+ Quản lý tồn kho, nhân viên, doanh thu
++ Quản lý nhân viên, doanh thu, tác vụ

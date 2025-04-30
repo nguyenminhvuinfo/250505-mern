@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import authenRoutes from "./routes/authen.route.js";
 import auditRoutes from "./routes/audit.route.js";
 import hoadonRoutes from "./routes/hoadon.route.js";
+import bodyParser from 'body-parser';
 
 import { connectDB } from "./config/db.js";
 
@@ -12,6 +13,10 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+app.use(bodyParser.json());  // Phân tích JSON trong body của request
+
+app.use(bodyParser.urlencoded({ extended: true }));  // Để phân tích dữ liệu URL-encoded (nếu cần)
 
 app.use(express.json()); // này để nhận file Json nhé
 

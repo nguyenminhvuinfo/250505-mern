@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import {
   Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody,
   Table, Thead, Tbody, Tr, Th, Td,
-  Spinner, Alert, AlertIcon
+  Spinner, Alert, AlertIcon, Image, Flex
 } from '@chakra-ui/react';
 
 const AuditLogs = ({ isOpen, onClose }) => {
@@ -15,7 +15,8 @@ const AuditLogs = ({ isOpen, onClose }) => {
   }, [isOpen]);
 
   const fetchAuditLogs = async () => {
-    setIsLoading(true); setError(null);
+    setIsLoading(true); 
+    setError(null);
     const token = localStorage.getItem("token");
     if (!token) {
       setError("Không có token, vui lòng đăng nhập.");
@@ -39,18 +40,42 @@ const AuditLogs = ({ isOpen, onClose }) => {
     }
   };
 
+  // Format giá tiền từ số sang định dạng VNĐ
+  const formatPrice = (amount) => {
+    if (!amount && amount !== 0) return "N/A";
+    return new Intl.NumberFormat('vi-VN', { 
+      style: 'currency', 
+      currency: 'VND',
+      maximumFractionDigits: 0
+    }).format(amount);
+  };
+  
+  // Format ngày từ timestamp sang định dạng DD/MM/YYYY
+  const formatDate = (timestamp) => {
+    if (!timestamp) return "N/A";
+    try {
+      const date = new Date(timestamp);
+      if (isNaN(date.getTime())) return "N/A";
+      
+      return new Intl.DateTimeFormat('vi-VN', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      }).format(date);
+    } catch (error) {
+      console.error("Lỗi định dạng ngày:", error);
+      return "N/A";
+    }
+  };
+
   // Hiển thị tên sản phẩm tại thời điểm thay đổi
   const getProductName = (log) => {
-    // Nếu action là DELETE, hiển thị tên cũ từ oldData
     if (log.action === 'DELETE') {
       return log.changes?.old?.name || "Sản phẩm không tồn tại hoặc đã bị xóa";
     }
-
-    // Trường hợp UPDATE hoặc CREATE, hiển thị tên sản phẩm mới nhất từ newData
     if (log.action === 'UPDATE' || log.action === 'CREATE') {
       return log.changes?.new?.name || log.product || "Không xác định";
     }
-
     return "Không xác định";
   };
 
@@ -58,15 +83,25 @@ const AuditLogs = ({ isOpen, onClose }) => {
   const extractChangeInfo = (log, field) => {
     const oldValue = log.changes?.old?.[field];
     const newValue = log.changes?.new?.[field];
-    return oldValue && newValue ? { old: oldValue, new: newValue } : null;
+    
+    // Kiểm tra nếu giá trị cũ và mới giống nhau, không cần hiển thị sự thay đổi
+    if (oldValue === newValue) return null;
+
+    return oldValue !== undefined && newValue !== undefined ? { old: oldValue, new: newValue } : null;
   };
 
   // Render nội dung chi tiết với thông tin thay đổi
   const renderDetailContent = (log) => {
+    // Đối với UPDATE, kiểm tra nếu không có sự thay đổi nào
     if (log.action === 'UPDATE') {
       const nameChange = extractChangeInfo(log, 'name');
       const priceChange = extractChangeInfo(log, 'price');
       const imageChange = extractChangeInfo(log, 'image');
+
+      // Kiểm tra nếu tất cả các thay đổi đều không có sự thay đổi thực tế
+      if (!nameChange && !priceChange && !imageChange) {
+        return <div>Không có sự thay đổi nào</div>;
+      }
 
       return (
         <>
@@ -77,12 +112,32 @@ const AuditLogs = ({ isOpen, onClose }) => {
           )}
           {priceChange && (
             <div>
-              <strong>Giá tiền:</strong> {priceChange.old} → {priceChange.new}
+              <strong>Giá tiền:</strong> {formatPrice(priceChange.old)} → {formatPrice(priceChange.new)}
             </div>
           )}
           {imageChange && (
             <div>
-              <strong>Hình ảnh:</strong> {imageChange.old} → {imageChange.new}
+              <strong>Hình ảnh:</strong>
+              {/* Hiển thị hình ảnh cũ và mới trên cùng một hàng */}
+              <Flex align="center">
+                <Image 
+                  src={imageChange.old} 
+                  alt="Old Image" 
+                  boxSize="80px" 
+                  objectFit="cover" 
+                  fallbackSrc="https://i.pinimg.com/originals/ef/8b/bd/ef8bbd4554dedcc2fd1fd15ab0ebd7a1.gif" 
+                  mr={2}
+                />
+                <span> → </span>
+                <Image 
+                  src={imageChange.new} 
+                  alt="New Image" 
+                  boxSize="80px" 
+                  objectFit="cover" 
+                  fallbackSrc="https://i.pinimg.com/originals/ef/8b/bd/ef8bbd4554dedcc2fd1fd15ab0ebd7a1.gif" 
+                  ml={2}
+                />
+              </Flex>
             </div>
           )}
         </>
@@ -93,8 +148,19 @@ const AuditLogs = ({ isOpen, onClose }) => {
     return (
       <>
         <div><strong>Tên sản phẩm:</strong> {log.changes?.new?.name || log.changes?.old?.name || "Không xác định"}</div>
-        <div><strong>Giá tiền:</strong> {log.changes?.new?.price || log.changes?.old?.price}</div>
-        <div><strong>Link ảnh:</strong> {log.changes?.new?.image || log.changes?.old?.image}</div>
+        <div>
+          <strong>Giá tiền:</strong> {formatPrice(log.changes?.new?.price || log.changes?.old?.price)}
+        </div>
+        <div><strong>Hình ảnh:</strong>
+          {/* Hiển thị hình ảnh */}
+          <Image 
+            src={log.changes?.new?.image || log.changes?.old?.image} 
+            alt="Product Image" 
+            boxSize="80px" 
+            objectFit="cover" 
+            fallbackSrc="https://i.pinimg.com/originals/ef/8b/bd/ef8bbd4554dedcc2fd1fd15ab0ebd7a1.gif" 
+          />
+        </div>
       </>
     );
   };
@@ -116,8 +182,9 @@ const AuditLogs = ({ isOpen, onClose }) => {
                 <Tr>
                   <Th width="15%" >Phương thức</Th>
                   <Th width="15%">User</Th>
-                  <Th width="25%">Sản phẩm</Th>
-                  <Th width="45%" textAlign="center">Nội dung chi tiết</Th>
+                  <Th width="15%">Ngày chỉnh sửa</Th>
+                  <Th width="20%">Sản phẩm</Th>
+                  <Th width="35%" textAlign="center">Nội dung chi tiết</Th>
                 </Tr>
               </Thead>
               <Tbody>
@@ -129,12 +196,15 @@ const AuditLogs = ({ isOpen, onClose }) => {
                        'XÓA BỎ'}
                     </Td>
                     <Td style={{ wordWrap: 'break-word', maxWidth: '15%' }}>{log.user}</Td>
-                    <Td style={{ wordWrap: 'break-word', maxWidth: '25%' }}>{getProductName(log)}</Td>
-                    <Td style={{ wordWrap: 'break-word', maxWidth: '50%' }}>{renderDetailContent(log)}</Td>
+                    <Td style={{ wordWrap: 'break-word', maxWidth: '15%' }}>
+                      {formatDate(log.timestamp)}
+                    </Td>
+                    <Td style={{ wordWrap: 'break-word', maxWidth: '20%' }}>{getProductName(log)}</Td>
+                    <Td style={{ wordWrap: 'break-word', maxWidth: '35%' }}>{renderDetailContent(log)}</Td>
                   </Tr>
                 )) : (
                   <Tr>
-                    <Td colSpan={4} textAlign="center">Không có nhật ký nào.</Td>
+                    <Td colSpan={5} textAlign="center">Không có nhật ký nào.</Td>
                   </Tr>
                 )}
               </Tbody>

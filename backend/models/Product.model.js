@@ -14,7 +14,7 @@ const productSchema = new mongoose.Schema({
     type: Number,
     required: [true, "Giá sản phẩm là bắt buộc"],
     min: [1, "Giá phải ≥ 1"],
-    max: [10000, "Giá phải ≤ 10000"]
+    max: [1000000000, "Giá phải ≤ 1000000000"]
   },
   image: {
     type: String,
