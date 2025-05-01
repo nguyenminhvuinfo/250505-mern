@@ -1,5 +1,16 @@
-import { Container, VStack, Heading, useColorModeValue, Input, Button, Box, useToast, Text, InputGroup, InputLeftElement } from "@chakra-ui/react";
-import { useState, useEffect } from "react";
+import { 
+  Container, 
+  VStack, 
+  Heading, 
+  useColorModeValue, 
+  Input, 
+  Button, 
+  Box, 
+  useToast,
+  InputGroup,
+  InputRightElement
+} from "@chakra-ui/react";
+import { useState } from "react";
 import { useProductStore } from "../store/product";
 
 const CreatePage = () => {
@@ -8,33 +19,26 @@ const CreatePage = () => {
     price: "",
     image: "",
   });
-  const [formattedPrice, setFormattedPrice] = useState("");
   const toast = useToast();
 
   const { createProduct } = useProductStore();
 
-  // Format giá tiền từ số sang định dạng VNĐ
-  const formatPrice = (amount) => {
-    return new Intl.NumberFormat('vi-VN', { 
-      style: 'currency', 
-      currency: 'VND',
-      maximumFractionDigits: 0
-    }).format(amount);
+  // Format số với dấu chấm phân cách hàng nghìn
+  const formatNumberWithCommas = (number) => {
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   };
-
-  // Cập nhật định dạng giá mỗi khi giá thay đổi
-  useEffect(() => {
-    if (newProduct.price) {
-      setFormattedPrice(formatPrice(newProduct.price));
-    } else {
-      setFormattedPrice("");
-    }
-  }, [newProduct.price]);
 
   const handlePriceChange = (e) => {
     // Chỉ cho phép nhập số
-    const value = e.target.value.replace(/[^\d]/g, "");
-    setNewProduct({ ...newProduct, price: value });
+    const rawValue = e.target.value.replace(/[^\d]/g, "");
+    
+    // Cập nhật giá trị trong state
+    setNewProduct({ ...newProduct, price: rawValue });
+  };
+
+  const getDisplayPrice = () => {
+    if (!newProduct.price) return "";
+    return formatNumberWithCommas(newProduct.price);
   };
 
   const handleAddProduct = async() => {
@@ -59,7 +63,6 @@ const CreatePage = () => {
         price: "",
         image: "",
       });
-      setFormattedPrice("");
     }
   };
 
@@ -84,19 +87,21 @@ const CreatePage = () => {
               onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value})}
             />
             
-            <VStack spacing={1} w="full" align="start">
+            <InputGroup>
               <Input
                 placeholder="Giá sản phẩm"
                 name="price"
-                value={newProduct.price}
+                value={getDisplayPrice()}
                 onChange={handlePriceChange}
+                pr="40px"
               />
-              {newProduct.price && (
-                <Text fontSize="sm" color="gray.500">
-                  {formattedPrice}
-                </Text>
-              )}
-            </VStack>
+              <InputRightElement
+                pointerEvents="none"
+                color="gray.500"
+                fontSize="1em"
+                children="đ"
+              />
+            </InputGroup>
             
             <Input
               placeholder="Hình ảnh sản phẩm"

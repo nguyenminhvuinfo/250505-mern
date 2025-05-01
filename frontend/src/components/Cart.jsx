@@ -120,7 +120,7 @@ import {
         {cart.items.length === 0 && (
           <Box textAlign="center" py={8}>
             <Icon as={FaReceipt} fontSize="4xl" color="gray.300" />
-            <Text color="gray.500" mt={2}>Hiện chưa có dịch vụ nào</Text>
+            <Text color="gray.500" mt={2}>Hiện chưa có sản phẩm nào</Text>
           </Box>
         )}
   

@@ -19,7 +19,9 @@ import {
     ModalFooter,
     Button,
     FormControl,
-    FormLabel
+    FormLabel,
+    InputGroup,
+    InputRightElement
 } from "@chakra-ui/react";
 import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
 import { useProductStore } from "../store/product";
@@ -27,7 +29,6 @@ import { useState, useEffect } from "react";
 
 const ProductCard = ({ product, compact = false }) => {
     const [updatedProduct, setUpdatedProduct] = useState(product);
-    const [formattedPrice, setFormattedPrice] = useState("");
     
     // Sử dụng useColorModeValue cho các màu sắc
     const textColor = useColorModeValue("gray.600", "gray.300");
@@ -40,7 +41,7 @@ const ProductCard = ({ product, compact = false }) => {
     const toast = useToast();
     const { isOpen, onOpen, onClose } = useDisclosure();
 
-    // Format giá tiền từ số sang định dạng VNĐ
+    // Format giá tiền từ số sang định dạng VNĐ (cho phần hiển thị trong card)
     const formatPrice = (amount) => {
         return new Intl.NumberFormat('vi-VN', { 
           style: 'currency', 
@@ -49,22 +50,15 @@ const ProductCard = ({ product, compact = false }) => {
         }).format(amount);
     };
 
-    // Cập nhật định dạng giá mỗi khi giá thay đổi
-    useEffect(() => {
-        if (updatedProduct.price) {
-            setFormattedPrice(formatPrice(updatedProduct.price));
-        } else {
-            setFormattedPrice("");
-        }
-    }, [updatedProduct.price]);
+    // Format số với dấu chấm phân cách hàng nghìn
+    const formatNumberWithCommas = (number) => {
+        return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    };
 
     // Reset về thông tin hiện tại khi mở modal
     useEffect(() => {
         if (isOpen) {
             setUpdatedProduct(product);
-            if (product.price) {
-                setFormattedPrice(formatPrice(product.price));
-            }
         }
     }, [isOpen, product]);
 
@@ -109,8 +103,13 @@ const ProductCard = ({ product, compact = false }) => {
 
     const handlePriceChange = (e) => {
         // Chỉ cho phép nhập số
-        const value = e.target.value.replace(/[^\d]/g, "");
-        setUpdatedProduct({...updatedProduct, price: value});
+        const rawValue = e.target.value.replace(/[^\d]/g, "");
+        setUpdatedProduct({...updatedProduct, price: rawValue});
+    };
+
+    const getDisplayPrice = () => {
+        if (!updatedProduct.price) return "";
+        return formatNumberWithCommas(updatedProduct.price);
     };
 
     return (
@@ -133,12 +132,12 @@ const ProductCard = ({ product, compact = false }) => {
                 src={product.image} 
                 fallbackSrc="https://i.pinimg.com/originals/ef/8b/bd/ef8bbd4554dedcc2fd1fd15ab0ebd7a1.gif" 
                 alt={product.name} 
-                h={compact ? 32 : 48} 
+                h={compact ? 32 : 52} 
                 w="full" 
                 objectFit="cover" 
             />
-            <Box p={compact ? 2 : 4}>
-                <Heading as="h3" size={compact ? "sm" : "md"} mb={1} noOfLines={1}>
+            <Box p={compact ? 3 : 4} height={compact ? "auto" : "120px"}>
+                <Heading as="h3" size={compact ? "sm" : "md"} mb={2} noOfLines={2} lineHeight="shorter">
                     {product.name}
                 </Heading>
                 <Text fontWeight="bold" fontSize={compact ? "lg" : "xl"} color={textColor} mb={compact ? 2 : 4}>
@@ -184,17 +183,21 @@ const ProductCard = ({ product, compact = false }) => {
                                 
                                 <FormControl>
                                     <FormLabel>Giá tiền</FormLabel>
-                                    <Input
-                                        placeholder="Giá tiền"
-                                        value={updatedProduct.price}
-                                        name="price"
-                                        onChange={handlePriceChange}
-                                    />
-                                    {updatedProduct.price && (
-                                        <Text fontSize="sm" color="gray.500" mt={1}>
-                                            {formattedPrice}
-                                        </Text>
-                                    )}
+                                    <InputGroup>
+                                        <Input
+                                            placeholder="Giá tiền"
+                                            value={getDisplayPrice()}
+                                            name="price"
+                                            onChange={handlePriceChange}
+                                            pr="40px"
+                                        />
+                                        <InputRightElement
+                                            pointerEvents="none"
+                                            color="gray.500"
+                                            fontSize="1em"
+                                            children="đ"
+                                        />
+                                    </InputGroup>
                                 </FormControl>
                                 
                                 <FormControl>
