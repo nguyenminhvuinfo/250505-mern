@@ -9,8 +9,8 @@ import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { useProductStore } from "../store/product";
 import { useAuthStore } from "../store/user";
-import ProductCard from "../components/ProductCard";
-import Receipt from "../components/Receipt";
+import ProductCard from "../components/HomeProduct/ProductCard";
+import Receipt from "../components/HomeReceipt/Receipt";
 
 const HomePage = ({ searchKeyword = "" }) => {
   const { fetchProducts, products } = useProductStore();

@@ -20,11 +20,12 @@ import {
 } from "@chakra-ui/react";
 import { useState, forwardRef, useImperativeHandle, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { useReceiptStore } from "../store/receipt";
+import { useReceiptStore } from "../../store/receipt";
 import { FaSignInAlt, FaTimes } from "react-icons/fa";
 import Cart from "./Cart";
 import Note from "./Note";
 import CheckOut from "./CheckOut";
+import QrPayment from "./QrPayment";
 
 const Receipt = forwardRef(({ isAuthenticated, user }, ref) => {
   const componentId = useRef(`receipt-${Math.random().toString(36).substring(2, 9)}`).current;
@@ -51,7 +52,8 @@ const Receipt = forwardRef(({ isAuthenticated, user }, ref) => {
   });
   const [activeTabIndex, setActiveTabIndex] = useState(0);
   const [isProcessing, setIsProcessing] = useState(false);
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen: isNoteOpen, onOpen: onNoteOpen, onClose: onNoteClose } = useDisclosure();
+  const { isOpen: isQrOpen, onOpen: onQrOpen, onClose: onQrClose } = useDisclosure();
   const [showAuthAlert, setShowAuthAlert] = useState(false);
   
   const bgCard = useColorModeValue("white", "gray.800");
@@ -203,7 +205,7 @@ const Receipt = forwardRef(({ isAuthenticated, user }, ref) => {
     navigate("/login");
   };
 
-  const handleCheckout = async () => {
+  const handleActionButton = () => {
     if (carts[activeTabIndex].items.length === 0) {
       toast({
         title: "Giỏ hàng trống",
@@ -220,6 +222,24 @@ const Receipt = forwardRef(({ isAuthenticated, user }, ref) => {
       return;
     }
 
+    const activeCart = carts[activeTabIndex];
+    
+    // Kiểm tra phương thức thanh toán
+    if (activeCart.paymentMethod === "Chuyển khoản") {
+      // Mở modal QR
+      onQrOpen();
+    } else {
+      // Xử lý thanh toán tiền mặt
+      handleCheckout();
+    }
+  };
+
+  const handleQrPaymentComplete = () => {
+    // Sau khi người dùng xác nhận đã thanh toán qua QR, tiến hành xử lý thanh toán
+    handleCheckout();
+  };
+
+  const handleCheckout = async () => {
     setIsProcessing(true);
     
     const userId = user?._id;
@@ -402,9 +422,9 @@ const Receipt = forwardRef(({ isAuthenticated, user }, ref) => {
               <CheckOut 
                 cart={cart}
                 updatePaymentMethod={updatePaymentMethod}
-                handleCheckout={handleCheckout}
+                handleCheckout={handleActionButton}
                 isProcessing={isProcessing}
-                onOpenNote={onOpen}
+                onOpenNote={onNoteOpen}
               />
             </TabPanel>
           ))}
@@ -415,8 +435,16 @@ const Receipt = forwardRef(({ isAuthenticated, user }, ref) => {
       <Note 
         note={carts[activeTabIndex]?.note || ""} 
         setNote={setNote} 
-        isModalOpen={isOpen} 
-        onModalClose={onClose} 
+        isModalOpen={isNoteOpen} 
+        onModalClose={onNoteClose} 
+      />
+
+      {/* QR Payment Modal */}
+      <QrPayment
+        isOpen={isQrOpen}
+        onClose={onQrClose}
+        cart={carts[activeTabIndex]}
+        onCompletePayment={handleQrPaymentComplete}
       />
     </Box>
   );

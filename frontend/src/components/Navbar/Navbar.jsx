@@ -4,9 +4,9 @@ import { PlusSquareIcon, ChevronDownIcon } from "@chakra-ui/icons";
 import { FaUser, FaClipboardList, FaReceipt, FaChartLine, FaSignOutAlt } from "react-icons/fa";
 import { IoMoon } from "react-icons/io5";
 import { LuSun } from "react-icons/lu";
-import { useAuthStore } from "../store/user";
+import { useAuthStore } from "../../store/user";
 import { useDisclosure } from '@chakra-ui/react';
-import AuditLogs from './AuditLogs'; // Import Modal
+import AuditLogs from './AuditLogs'; 
 
 const Navbar = ({ onSearch }) => {
   const { colorMode, toggleColorMode } = useColorMode();
