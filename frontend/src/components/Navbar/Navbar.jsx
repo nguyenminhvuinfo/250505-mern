@@ -6,14 +6,34 @@ import { IoMoon } from "react-icons/io5";
 import { LuSun } from "react-icons/lu";
 import { useAuthStore } from "../../store/user";
 import { useDisclosure } from '@chakra-ui/react';
-import AuditLogs from './AuditLogs'; 
+import AuditLogs from './AuditLogs';
+import TransactionHistory from './TransactionHistory';
+import RevenueStatistics from './RevenueStatistics';
 
 const Navbar = ({ onSearch }) => {
   const { colorMode, toggleColorMode } = useColorMode();
   const bg = useColorModeValue("gray.100", "gray.900");
   const navigate = useNavigate();
   const { logout, user } = useAuthStore();
-  const { isOpen, onOpen, onClose } = useDisclosure(); // Modal control
+  
+  // Modal controls
+  const { 
+    isOpen: isAuditLogOpen, 
+    onOpen: onAuditLogOpen, 
+    onClose: onAuditLogClose 
+  } = useDisclosure();
+  
+  const {
+    isOpen: isTransactionHistoryOpen,
+    onOpen: onTransactionHistoryOpen,
+    onClose: onTransactionHistoryClose
+  } = useDisclosure();
+
+  const {
+    isOpen: isRevenueStatisticsOpen,
+    onOpen: onRevenueStatisticsOpen,
+    onClose: onRevenueStatisticsClose
+  } = useDisclosure();
 
   const handleChange = (e) => {
     onSearch(e.target.value);
@@ -56,13 +76,13 @@ const Navbar = ({ onSearch }) => {
                 <Text px={3} py={1} fontSize="sm" color="gray.500">
                   Xin chào, {user?.name || user?.email || "Pháp sư vô danh"}
                 </Text>
-                <MenuItem icon={<FaClipboardList />} onClick={onOpen}>
+                <MenuItem icon={<FaClipboardList />} onClick={onAuditLogOpen}>
                   Nhật ký chỉnh sửa
                 </MenuItem>
-                <MenuItem icon={<FaReceipt />}>
+                <MenuItem icon={<FaReceipt />} onClick={onTransactionHistoryOpen}>
                   Lịch sử giao dịch
                 </MenuItem>
-                <MenuItem icon={<FaChartLine />}>
+                <MenuItem icon={<FaChartLine />} onClick={onRevenueStatisticsOpen}>
                   Thống kê doanh thu
                 </MenuItem>
                 <MenuItem icon={<FaSignOutAlt />} onClick={handleLogout}>
@@ -75,7 +95,13 @@ const Navbar = ({ onSearch }) => {
       </Container>
 
       {/* Modal Audit Log */}
-      <AuditLogs isOpen={isOpen} onClose={onClose} />
+      <AuditLogs isOpen={isAuditLogOpen} onClose={onAuditLogClose} />
+      
+      {/* Modal Transaction History */}
+      <TransactionHistory isOpen={isTransactionHistoryOpen} onClose={onTransactionHistoryClose} />
+
+      {/* Modal Revenue Statistics */}
+      <RevenueStatistics isOpen={isRevenueStatisticsOpen} onClose={onRevenueStatisticsClose} />
     </Box>
   );
 };

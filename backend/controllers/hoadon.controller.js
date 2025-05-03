@@ -48,8 +48,6 @@ export const createInvoice = async (req, res) => {
       note,
       date: new Date()
     });
-
-    console.log("Đang tạo hóa đơn:", newInvoice);
     await newInvoice.save();
     res.status(201).json({ success: true, data: newInvoice });
 
