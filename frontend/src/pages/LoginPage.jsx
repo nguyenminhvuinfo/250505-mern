@@ -1,5 +1,17 @@
 import { useState } from "react";
-import { Container, Input, VStack, Button, Heading, useToast, InputGroup, InputRightElement, IconButton } from "@chakra-ui/react";
+import { 
+  Container, 
+  Input, 
+  VStack, 
+  Button, 
+  Heading, 
+  useToast, 
+  InputGroup, 
+  InputRightElement, 
+  IconButton,
+  Text,
+  Box
+} from "@chakra-ui/react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/user";
@@ -37,6 +49,12 @@ const LoginPage = () => {
     }
   };
 
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleLogin();
+    }
+  };
+
   return (
     <Container maxW="sm" mt={10}>
       <VStack spacing={6}>
@@ -45,7 +63,8 @@ const LoginPage = () => {
           placeholder="Email" 
           name="email" 
           value={formData.email} 
-          onChange={handleChange} 
+          onChange={handleChange}
+          onKeyPress={handleKeyPress}
         />
         <InputGroup>
           <Input
@@ -54,6 +73,7 @@ const LoginPage = () => {
             type={showPassword ? "text" : "password"}
             value={formData.password}
             onChange={handleChange}
+            onKeyPress={handleKeyPress}
           />
           <InputRightElement>
             <IconButton
@@ -72,9 +92,14 @@ const LoginPage = () => {
         >
           Đăng nhập
         </Button>
-        <Button variant="link" colorScheme="blue" onClick={() => navigate("/register")}>
-          Chưa có tài khoản? Đăng ký
-        </Button>
+        <Box w="100%" display="flex" justifyContent="space-between">
+          <Button variant="link" colorScheme="blue" onClick={() => navigate("/register")}>
+            Chưa có tài khoản? Đăng ký
+          </Button>
+          <Button variant="link" colorScheme="blue" onClick={() => navigate("/forgot-password")}>
+            Quên mật khẩu?
+          </Button>
+        </Box>
       </VStack>
     </Container>
   );

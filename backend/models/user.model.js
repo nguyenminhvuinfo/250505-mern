@@ -1,30 +1,37 @@
-// models/user.model.js
+// user.model.js
 import mongoose from "mongoose";
+import validator from "validator";
 
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: [true, "Họ tên là bắt buộc"],
-    trim: true,
-    minlength: [1, "Tên phải có ít nhất 1 ký tự"],
-    maxlength: [40, "Tên không vượt quá 40 ký tự"],
-    validate: {
-      validator: v => /^[A-Za-zÀ-ỹ\s]+$/.test(v),
-      message: props => `${props.value} không hợp lệ (chỉ chữ và dấu cách)`
-    }
+    required: [true, "Vui lòng nhập họ tên"],
+    trim: true
   },
   email: {
     type: String,
-    required: [true, "Email là bắt buộc"],
+    required: [true, "Vui lòng nhập email"],
     unique: true,
     lowercase: true,
-    match: [/\S+@\S+\.\S+/, "Email không đúng định dạng"]
+    validate: [validator.isEmail, "Email không hợp lệ"]
   },
   password: {
     type: String,
-    required: [true, "Mật khẩu là bắt buộc"],
-    minlength: [6, "Mật khẩu tối thiểu 6 ký tự"]
+    required: [true, "Vui lòng nhập mật khẩu"],
+    minlength: [6, "Mật khẩu phải có ít nhất 6 ký tự"]
+  },
+  resetPasswordToken: String,
+  resetPasswordExpire: Date,
+  createdAt: {
+    type: Date,
+    default: Date.now
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now
   }
 }, { timestamps: true });
 
-export default mongoose.model("User", userSchema);
+const User = mongoose.model("User", userSchema);
+
+export default User;

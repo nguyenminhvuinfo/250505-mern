@@ -1,9 +1,13 @@
 import express from "express";
-import { registerUser, loginUser } from "../controllers/authen.controller.js";
+import { registerUser, loginUser, forgotPassword, verifyResetCode, resetPassword  } from "../controllers/authen.controller.js";
 import { protect } from "../middleware/authen.middleware.js"; 
 import User from "../models/user.model.js";
 
 const router = express.Router();
+
+router.post("/forgot-password", forgotPassword);
+router.post("/verify-reset-code", verifyResetCode);
+router.post("/reset-password", resetPassword);
 
 router.post("/register", registerUser); 
 router.post("/login", loginUser);
