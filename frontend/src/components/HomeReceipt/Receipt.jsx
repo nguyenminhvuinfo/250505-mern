@@ -18,7 +18,7 @@ import {
   IconButton,
   Text
 } from "@chakra-ui/react";
-import { useState, forwardRef, useImperativeHandle, useRef } from "react";
+import { useState, forwardRef, useImperativeHandle, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useReceiptStore } from "../../store/receipt";
 import { FaSignInAlt, FaTimes } from "react-icons/fa";
@@ -55,6 +55,8 @@ const Receipt = forwardRef(({ isAuthenticated, user }, ref) => {
   const { isOpen: isNoteOpen, onOpen: onNoteOpen, onClose: onNoteClose } = useDisclosure();
   const { isOpen: isQrOpen, onOpen: onQrOpen, onClose: onQrClose } = useDisclosure();
   const [showAuthAlert, setShowAuthAlert] = useState(false);
+  // Thêm state để lưu trữ cart đang hiển thị QR
+  const [qrActiveCart, setQrActiveCart] = useState(null);
   
   const bgCard = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.700");
@@ -224,6 +226,9 @@ const Receipt = forwardRef(({ isAuthenticated, user }, ref) => {
 
     const activeCart = carts[activeTabIndex];
     
+    // Lưu cart hiện tại vào state để sử dụng cho QR modal
+    setQrActiveCart({...activeCart});
+    
     // Kiểm tra phương thức thanh toán
     if (activeCart.paymentMethod === "Chuyển khoản") {
       // Mở modal QR
@@ -237,6 +242,8 @@ const Receipt = forwardRef(({ isAuthenticated, user }, ref) => {
   const handleQrPaymentComplete = () => {
     // Sau khi người dùng xác nhận đã thanh toán qua QR, tiến hành xử lý thanh toán
     handleCheckout();
+    // Đóng modal QR
+    onQrClose();
   };
 
   const handleCheckout = async () => {
@@ -443,7 +450,7 @@ const Receipt = forwardRef(({ isAuthenticated, user }, ref) => {
       <QrPayment
         isOpen={isQrOpen}
         onClose={onQrClose}
-        cart={carts[activeTabIndex]}
+        cart={qrActiveCart}
         onCompletePayment={handleQrPaymentComplete}
       />
     </Box>
