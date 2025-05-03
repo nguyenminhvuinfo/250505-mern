@@ -5,9 +5,9 @@ import crypto from "crypto";
 import nodemailer from "nodemailer";
 
 // Cấu hình nodemailer
-const EMAIL_USERNAME="minhlam1610.work@gmail.com";
-const EMAIL_PASSWORD="jhnn nfcl yygn npxw";
-const EMAIL_FROM="minhlam1610.work@gmail.com";
+const EMAIL_USERNAME="minhlam1610.work@gmail.com"; // này là đăng nhập gmail á, xài gmail cá nhân
+const EMAIL_PASSWORD="jhnn nfcl yygn npxw"; // này là pass của App chứ ko phải pass thực tế
+const EMAIL_FROM="minhlam1610.work@gmail.com"; //này là mail kiểu nó gửi tới từ địa chỉ này như là SukemStore@mail mà xài cá nhân cho dễ demo
 const JWT_SECRET="tieuminhdeptrai";
 
 
@@ -124,13 +124,18 @@ export const forgotPassword = async (req, res) => {
     const mailOptions = {
       from: EMAIL_FROM,
       to: user.email,
-      subject: "Đặt lại mật khẩu",
+      subject: "Sukem Store Đặt lại mật khẩu",
       html: `
-        <h1>Xin chào ${user.name}</h1>
-        <p>Bạn nhận được email này vì bạn (hoặc ai đó) đã yêu cầu đặt lại mật khẩu.</p>
-        <p>Mã xác minh của bạn là: <strong>${resetCode}</strong></p>
-        <p>Mã này sẽ hết hạn sau 15 phút.</p>
-        <p>Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email này.</p>
+         <div style="font-family: Arial, sans-serif; background-color: #f6f6f6; padding: 40px;">
+            <div style="max-width: 600px; margin: auto; background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+              <div style="text-align: center; margin-bottom: 20px;">
+              </div>
+              <h1 style="color: #333;">Xin chào ${user.name}</h1>
+              <h2 style="color: #555;">Bạn nhận được email này vì bạn (hoặc ai đó) đã yêu cầu đặt lại mật khẩu.</h2>
+              <p style="font-size: 18px; color: #000;">Mã xác minh của bạn là:</p>
+              <p style="font-size: 32px; font-weight: bold; color: #2c3e50; text-align: center;">${resetCode}</p>
+            </div>
+          </div>
       `
     };
     
