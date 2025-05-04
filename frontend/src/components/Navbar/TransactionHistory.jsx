@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import {
   Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody,
   Table, Thead, Tbody, Tr, Th, Td,
-  Spinner, Alert, AlertIcon, Box, Text, Badge, Accordion, AccordionItem, AccordionButton, AccordionPanel, AccordionIcon
+  Spinner, Alert, AlertIcon, Box, Text, Badge, Accordion, AccordionItem, AccordionButton, AccordionPanel, AccordionIcon,
+  useColorModeValue
 } from '@chakra-ui/react';
 import { useReceiptStore } from '../../store/receipt'; 
 
@@ -10,6 +11,7 @@ const TransactionHistory = ({ isOpen, onClose }) => {
   const { receipts, fetchReceipts } = useReceiptStore();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const noteBgColor = useColorModeValue('gray.50', 'gray.700');
 
   useEffect(() => {
     if (isOpen) {
@@ -71,8 +73,8 @@ const TransactionHistory = ({ isOpen, onClose }) => {
     }
   };
 
-  // Hiển thị danh sách sản phẩm
-  const renderProducts = (products) => {
+  // Hiển thị danh sách sản phẩm và ghi chú
+  const renderProducts = (products, note) => {
     if (!products || products.length === 0) return "Không có sản phẩm";
     
     return (
@@ -81,7 +83,7 @@ const TransactionHistory = ({ isOpen, onClose }) => {
           <AccordionItem border="none">
             <AccordionButton px={0}>
               <Box flex="1" textAlign="left">
-                <Text fontWeight="medium">Xem {products.length} sản phẩm</Text>
+                <Text fontWeight="medium">Xem {products.length} sản phẩm và ghi chú</Text>
               </Box>
               <AccordionIcon />
             </AccordionButton>
@@ -107,6 +109,14 @@ const TransactionHistory = ({ isOpen, onClose }) => {
                     ))}
                   </Tbody>
                 </Table>
+                
+                {/* Hiển thị ghi chú */}
+                {note && (
+                  <Box mt={3} p={2} bg={noteBgColor} borderRadius="md">
+                    <Text fontWeight="medium" mb={1}>Ghi chú:</Text>
+                    <Text>{note}</Text>
+                  </Box>
+                )}
               </Box>
             </AccordionPanel>
           </AccordionItem>
@@ -176,7 +186,7 @@ const TransactionHistory = ({ isOpen, onClose }) => {
                       <Td isNumeric fontWeight="bold" style={{ whiteSpace: "nowrap" }}>
                         {formatPrice(receipt.totalAmount)}
                       </Td>
-                      <Td width="300px">{renderProducts(receipt.products)}</Td>
+                      <Td width="300px">{renderProducts(receipt.products, receipt.note)}</Td>
                     </Tr>
                   ))
                 ) : (
