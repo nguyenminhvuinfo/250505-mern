@@ -9,7 +9,7 @@
 - vào https://dashboard.render.com/
 - add new -> web service -> existing image -> paste -> đợi cửa sổ bật lên chạy xong copy cái ấy (web backend)
 # Deploy frontend 
-- Copy link web trên vào .env của t
+- Copy link web trên vào .env của t (trong fe)
 - Mở tạo repo github (chỉ chứa frontend) 
 - Mở vercel (quan trọng) copy biến .env vào trong mục tạo web (có mục để .env)
 - xong, mở web và thưởng thức 
